@@ -1,0 +1,4 @@
+streamlit
+pandas
+requests # Required to make the HTTP calls to NCI CIR API
+rdkit # For SMILES validation and canonicalization
