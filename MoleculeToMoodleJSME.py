@@ -2,7 +2,7 @@
 """
 Created on Tue Sep 30 19:14:39 2025
 
-@author: Carlos Fernandez
+@author: Carlos Fernandez Marcos
 """
 
 import streamlit as st
@@ -406,4 +406,5 @@ with list_col:
                 st.write(f"**{i+1}.** {n} → `{s}`")
             with cols[1]:
                 st.button("🗑️", help=texts["delete_tooltip"], key=f"del_{i}", on_click=delete_question, args=(i,))
+
             st.markdown("---")
