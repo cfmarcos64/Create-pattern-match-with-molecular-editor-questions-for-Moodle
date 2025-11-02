@@ -147,15 +147,15 @@ def name_to_smiles(compound_name):
 
 
 def escape_smiles(smiles):
-    """Adds an escape symbol to Moodle's special characters in a SMILES string."""
-    special_characters = "()[]\\"
-    new_smiles = ""
-    for char in smiles:
-        if char in special_characters:
-            new_smiles += "\\" + char
-        else:
-            new_smiles += char
-    return new_smiles
+    """Escapes special SMILES characters for Moodle's pmatchjme answer format."""
+    if smiles is None:
+        return ""
+    s = str(smiles)
+    # Scapes first existing backslashes
+    s = s.replace("\\", "\\\\")
+    # Then scapes brackets
+    s = s.replace("(", "\\(").replace(")", "\\)").replace("[", "\\[").replace("]", "\\]")
+    return s
 
 
 def process_bulk_file(uploaded_file, texts):
@@ -408,3 +408,4 @@ with list_col:
                 st.button("🗑️", help=texts["delete_tooltip"], key=f"del_{i}", on_click=delete_question, args=(i,))
 
             st.markdown("---")
+
