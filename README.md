@@ -90,12 +90,17 @@ The project directory should contain at least these files:
 
 ├──  __init__.py             # Python part of the component
 
-├── my_component/            # Directory for the custom JSME component
+├── frontend/                # React/TypeScript source code
 
+│    └── index.html
 
-│    └── frontend/            # React/TypeScript source code
+│    └── vite.config.ts
 
-│         └── src/           # Compiled JS assets (created by 'npm run build' for production/alternative mode)
+│    └── src/
+
+│    └──    └── MyComponent.tsx
+
+│    └── node_modules/       # Compiled JS assets (created by 'npm run build' for production/alternative mode)
 
 └── README.md                # This file
 
