@@ -5,80 +5,93 @@ import {
 } from "streamlit-component-lib"
 import React, { ReactNode } from "react"
 
-// Declaración global para el applet JSME
+/**
+ * Global declaration for the JSME applet, which is loaded externally.
+ */
 declare global {
   interface Window {
     JSApplet: any;
   }
 }
 
-// Interfaz para la estructura JSON de entrada/salida
+/**
+ * Interface for the JSON structure used for communication between Python and the component.
+ * This structure holds the SMILES string and a unique ID for request tracking.
+ */
 interface SmilesRequest {
     smiles: string;
-    id: string; // Identificador único de la solicitud
+    id: string; // Unique identifier for the request
 }
 
+/**
+ * Component state management.
+ */
 interface State {
   jsmeLoaded: boolean;
-  status: string; // Estado de procesamiento interno
-  currentRequestId: string | null; // El ID de la última solicitud procesada/en curso
+  status: string; // Internal processing status
+  currentRequestId: string | null; // ID of the last processed/in-progress request
 }
 
 class JSMEComponent extends StreamlitComponentBase<State> {
   private jsmeApplet: any = null;
-  // SMILES que Streamlit usa para comunicar la entrada es ahora 'smiles_json'
+  // Tracker for the last JSON input received from Streamlit
   private currentInputJson: string = ''; 
 
   constructor(props: any) {
     super(props);
+    // Initialize component state
     this.state = { jsmeLoaded: false, status: 'Initial', currentRequestId: null }; 
   }
 
   componentDidMount(): void {
+    // Start the JSME loading sequence when the component mounts
     this.loadJSME();
   }
 
   componentDidUpdate(): void {
-    // El input de Python es props.args.smiles_json
+    // Python input is received via props.args.smiles_json
     const nextInputJson = this.props.args?.smiles_json || null;
     let nextRequest: SmilesRequest | null = null;
     
-    // 1. Intentar parsear el JSON de entrada (si es diferente)
+    // --- 1. Check and Parse Input ---
+    // Only attempt parsing if the input JSON string is new and not null
     if (nextInputJson && nextInputJson !== this.currentInputJson) {
         try {
             nextRequest = JSON.parse(nextInputJson);
         } catch (e) {
             console.error("Failed to parse input JSON:", e);
-            this.currentInputJson = nextInputJson; // Bloquea el procesamiento
+            this.currentInputJson = nextInputJson; // Block processing of this malformed input
             return; 
         }
     }
     
-    // 2. Lógica de Disparo de Procesamiento
+    // --- 2. Processing Trigger Logic ---
     if (this.state.jsmeLoaded && nextRequest && nextRequest.smiles.trim() !== '') {
-        // Disparar procesamiento solo si el SMILES es nuevo y el ID es nuevo
+        // Trigger processing only if the SMILES is valid AND the request ID is new
         if (nextRequest.id !== this.state.currentRequestId) {
-            this.currentInputJson = nextInputJson; // Actualizar tracker de JSON completo
+            this.currentInputJson = nextInputJson; // Update full JSON tracker
             this.setState({ 
                 status: 'Processing...',
                 currentRequestId: nextRequest.id 
             }); 
-            // Iniciar el procesamiento seguro inmediatamente
+            // Initiate the safe processing immediately
             this.safeProcessSmiles(nextRequest.smiles, nextRequest.id); 
         }
     }
     
-    // 3. Lógica de Limpieza (Python envía null para resetear)
-    // El componente se reinicia solo si el input es null O si el estado de requestID no coincide
-    // con el ID de la última respuesta enviada (para evitar reintentos de IDs ya completados).
+    // --- 3. Cleanup/Reset Logic ---
+    // If Python sends null, it signals a reset or a step completion. 
+    // We send an empty JSON back to force Python to re-evaluate the state.
     if (nextInputJson === null) {
-        // Enviar JSON vacío a Python. Esto forzará un RERUN de limpieza en Python.
         Streamlit.setComponentValue(JSON.stringify({})); 
-        this.currentInputJson = ''; // Reset tracker de input
+        this.currentInputJson = ''; // Reset input tracker
         this.setState({ status: 'Idle', currentRequestId: null }); 
     }
   }
 
+  /**
+   * Loads the external JSME script dynamically.
+   */
   loadJSME = (): void => {
     if (window.JSApplet) {
       this.initJSME();
@@ -92,6 +105,9 @@ class JSMEComponent extends StreamlitComponentBase<State> {
     document.head.appendChild(script);
   }
 
+  /**
+   * Waits for the JSApplet object to be globally available.
+   */
   waitForJSME = (): void => {
     if (window.JSApplet) {
       this.initJSME();
@@ -100,8 +116,11 @@ class JSMEComponent extends StreamlitComponentBase<State> {
     }
   }
 
+  /**
+   * Initializes the JSME applet in a hidden container for non-visual processing.
+   */
   initJSME = (): void => {
-    // CRUCIAL: Crear el JSME en un DIV oculto para que no interfiera con la UI
+    // Crucial: Create the JSME in a hidden DIV so it doesn't interfere with the UI
     const hiddenDiv = document.createElement('div');
     hiddenDiv.style.position = 'absolute';
     hiddenDiv.style.left = '-9999px';
@@ -110,54 +129,66 @@ class JSMEComponent extends StreamlitComponentBase<State> {
     hiddenDiv.id = 'jsme-processor';
     document.body.appendChild(hiddenDiv);
 
+    // Instantiate the JSME applet
     this.jsmeApplet = new window.JSApplet.JSME("jsme-processor", "200px", "200px");
     
     this.setState({ jsmeLoaded: true, status: 'Ready' }); 
     
+    // Set component height to minimal value since it's an invisible processor
     Streamlit.setFrameHeight(10);
   }
   
+  /**
+   * Checks if the JSME applet object is initialized and ready to receive commands.
+   */
   isJSMEAppletReady = (): boolean => {
     return this.jsmeApplet && typeof this.jsmeApplet.smiles === 'function';
   }
 
+  /**
+   * Attempts to process the SMILES input using JSME, with retries if the applet is not ready
+   * and a robust timeout to wait for the internal JSME processing to complete.
+   */
   safeProcessSmiles = (smiles: string, requestId: string, attempt: number = 0): void => {
     const MAX_ATTEMPTS = 20;
     
+    // 1. Check for max attempts
     if (attempt >= MAX_ATTEMPTS) {
         console.error("JSME Processing failed: Max retry attempts reached.");
-        // Devolver un valor de error específico con el ID para rastreo
+        // Return a specific error value with the ID for tracking
         const errorOutput = JSON.stringify({ smiles: `JSME_ERROR:TIMEOUT`, id: requestId });
         Streamlit.setComponentValue(errorOutput); 
         this.setState({ status: 'Failed (Timeout)' });
         return;
     }
 
+    // 2. Process SMILES if ready
     if (this.isJSMEAppletReady()) {
       try {
+        // Load the molecular input into the hidden JSME instance
         this.jsmeApplet.readGenericMolecularInput(smiles);
         
-        // Esperamos un tick del evento JSME (50ms es seguro)
+        // Wait for JSME's internal processing cycle to complete (robustness delay)
         setTimeout(() => {
              const processedSmiles = this.jsmeApplet.smiles() || "JSME_ERROR:EMPTY_OUTPUT"; 
         
-             // Devolver el resultado ESTUCTURADO con el ID
+             // Return the structured result with the request ID
              const finalOutput = JSON.stringify({ 
                  smiles: processedSmiles,
                  id: requestId
              });
              Streamlit.setComponentValue(finalOutput);
              this.setState({ status: 'Processed' });
-        }, 50); 
+        }, 100); // Increased from 50ms to 100ms for better robustness
         
       } catch (error) {
-        console.error("Error procesando SMILES en JSME:", error);
+        console.error("Error processing SMILES in JSME:", error);
         const errorOutput = JSON.stringify({ smiles: `JSME_ERROR:EXCEPTION`, id: requestId });
         Streamlit.setComponentValue(errorOutput);
         this.setState({ status: 'Failed (Exception)' });
       }
     } else {
-      // Reintentar después de 100ms
+      // 3. Retry if not ready
       console.log(`JSME not ready, retrying... Attempt: ${attempt + 1}`);
       setTimeout(() => this.safeProcessSmiles(smiles, requestId, attempt + 1), 100);
     }
@@ -166,7 +197,8 @@ class JSMEComponent extends StreamlitComponentBase<State> {
   public render = (): ReactNode => {
     const { jsmeLoaded, status } = this.state;
 
-    // Renderizamos un texto minimalista para indicar que el procesador está listo o trabajando.
+    // Render a minimal indicator of the processor's status for developer visibility.
+    // This element is hidden from the user interface.
     return (
       <div style={{
         padding: '5px 10px',
@@ -177,7 +209,7 @@ class JSMEComponent extends StreamlitComponentBase<State> {
         display: 'inline-block',
         minWidth: '200px'
       }}>
-        {jsmeLoaded ? `✓ Procesador JSME listo. Estado: ${status}` : '⏳ Cargando procesador JSME...'}
+        {jsmeLoaded ? `✓ JSME Processor Ready. Status: ${status}` : '⏳ Loading JSME Processor...'}
       </div>
     );
   }
