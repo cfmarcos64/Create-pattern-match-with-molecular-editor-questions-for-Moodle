@@ -88,13 +88,14 @@ The project directory should contain at least these files:
 
 ├── requirements.txt         # Python dependency list
 
+├──  __init__.py             # Python part of the component
+
 ├── my_component/            # Directory for the custom JSME component
 
-│    ├── __init__.py          # Python part of the component
 
 │    └── frontend/            # React/TypeScript source code
 
-│         └── build/           # Compiled JS assets (created by 'npm run build' for production/alternative mode)
+│         └── src/           # Compiled JS assets (created by 'npm run build' for production/alternative mode)
 
 └── README.md                # This file
 
