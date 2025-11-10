@@ -1,74 +1,101 @@
-# Moodle Question Generator with SMILES (NCI CIR Compatible)
+🧪 Moodle Chemistry Question Generator (SMILES/JSME Standardization)
 
-A Streamlit-based web application to generate Moodle-compatible XML files for molecular structure questions using SMILES notation. The tool supports both individual molecule entry and bulk processing from CSV/Excel files, leveraging the NCI Chemical Identifier Resolver (CIR) API for SMILES lookup and RDKit for canonicalization.
+This Streamlit application is designed to streamline the process of creating Moodle quiz questions of the pmatchjme type. These questions require students to draw a chemical structure using the integrated JSME molecular editor. The application automatically handles the heavy lifting: looking up the canonical SMILES for common compounds via the NCI Chemical Identifier Resolver (CIR) API and standardizing the structure using a hidden JSME component before exporting the final Moodle XML file.
 
-## Features
-- **Individual Entry**: Enter a molecule name to fetch its SMILES string via the NCI CIR API, with optional manual SMILES input.
-- **Bulk Upload**: Upload CSV or Excel files containing molecule names to process multiple molecules at once.
-- **SMILES Canonicalization**: Uses RDKit (optional) to standardize SMILES strings for compatibility with Moodle's JSME molecular editor.
-- **Moodle XML Export**: Generates XML files formatted for Moodle's `pmatchjme` question type.
-- **Multilingual Support**: Interface available in English and Spanish.
+✨ Features
 
-## Requirements
-- Python 3.8 or higher
-- Dependencies listed in `requirements.txt`:
-  - `streamlit`
-  - `pandas`
-  - `requests`
-  - `rdkit` (optional, for SMILES validation and canonicalization)
-  - `lxml` (for Excel file support)
+Multilingual Support: Interface available in English (EN) and Spanish (ES).
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/<your-username>/<your-repo-name>.git
-   cd <your-repo-name>
-   ```
+SMILES Lookup: Automatically searches the NCI Chemical Identifier Resolver (CIR) API to find the SMILES string for a given common molecule name.
 
-2. Create a virtual environment (recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+JSME Standardization: Uses the integrated jsme_editor component to convert the initial SMILES string into a standardized, canonical format that works reliably as the Moodle answer key. This ensures robustness and consistency.
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Individual Entry: Easily look up and process one molecule at a time.
 
-4. (Optional) Install RDKit for SMILES canonicalization:
-   ```bash
-   pip install rdkit
-   ```
+Bulk Processing: Upload a CSV or Excel file containing a list of molecule names for fast, automated generation of multiple questions.
 
-## Usage
-1. Run the Streamlit app:
-   ```bash
-   streamlit run app.py
-   ```
+Manual Entry: Bypass the API lookup by manually entering a SMILES string and a question name.
 
-2. Access the app in your browser (typically at `http://localhost:8501`).
+Moodle XML Export: Generates a ready-to-import Moodle XML file containing all the standardized structure-drawing questions (pmatchjme).
 
-3. **Individual Entry**:
-   - Enter a molecule name (e.g., "benzene") and check "Search for SMILES automatically" to fetch SMILES via the NCI CIR API.
-   - Alternatively, manually enter a SMILES string.
-   - Click "Add question" to include the molecule in the question list.
+🛠️ How It Works
 
-4. **Bulk Upload**:
-   - Upload a CSV or Excel file with a column named `name` (or `nombre` for Spanish files) containing molecule names.
-   - The app will process the file and fetch SMILES strings for each molecule.
+The core functionality relies on a three-step chemical data pipeline:
 
-5. **Export**:
-   - Once questions are added, download the generated Moodle XML file using the "Download Moodle XML" button.
-   - Import the XML file into Moodle to create `pmatchjme` questions.
+Input & Lookup (NCI CIR): The application takes a molecule name and queries the NCI CIR API to retrieve the initial, potentially non-canonical, SMILES string.
 
-## Notes
-- The NCI CIR API is used for automatic SMILES lookup. Ensure a stable internet connection for this feature.
-- RDKit is optional but recommended for validating and canonicalizing SMILES strings to ensure compatibility with Moodle's JSME editor.
-- For bulk uploads, ensure the input file has a column named `name` (or `nombre` for Spanish files) with molecule names, preferably in English for better API compatibility.
+RDKit Canonicalization: The retrieved or manually entered SMILES is first cleaned and canonicalized using RDKit.
 
-## Contributing
-Contributions are welcome! Please open an issue or submit a pull request with improvements or bug fixes.
+Final Standardization (JSME Component): The application sends the RDKit-canonicalized SMILES to a non-visible JSME component. This component outputs the final, highly standardized SMILES that is proven to work correctly with Moodle's embedded JSME structure validation.
+
+🚀 How to Run the Application
+
+There are two primary ways to access and use this tool:
+
+Option 1: Use the Public Web Application (Recommended)
+
+The application is deployed publicly and can be accessed directly through this link:
+
+👉
+
+$$INSERT PUBLIC APPLICATION URL HERE$$
+
+👈
+
+Option 2: Run Locally (Requires Python and Node.js)
+
+To run the application in local development mode, you must run two processes simultaneously in separate terminals: the Streamlit server (Python) and the frontend component development server (Node/npm).
+
+Clone the Repository and Install Python Dependencies:
+
+git clone [YOUR REPOSITORY URL]
+cd [repository-name]
+
+# Install Python dependencies (skip if already done)
+pip install -r requirements.txt
+
+
+Run the Component Frontend (TERMINAL 1):
+
+This step starts the component development server on http://localhost:3001. This is necessary for Streamlit to connect to the React component and see live changes.
+
+# Navigate to the frontend directory
+cd my_component/frontend
+# Install JavaScript dependencies (only the first time)
+npm install
+# Start the component development server
+npm run start
+
+
+Note: Keep this terminal open and running while using the Streamlit application.
+
+Run the Streamlit Application (TERMINAL 2):
+
+Open a second terminal. Navigate back to the project root folder and run the application.
+
+# Go back to the root directory
+cd ../..
+# Execute the main Streamlit application
+streamlit run MoleculeToMoodleJSME.py
+
+
+The Streamlit server will automatically connect to the component development server (Terminal 1).
+
+📁 File Structure
+
+The project directory should contain at least these files:
+
+/ (repository root)
+├── MoleculeToMoodleJSME.py  # The main Streamlit application
+├── requirements.txt         # Python dependency list
+├── my_component/            # Directory for the custom JSME component
+│   ├── __init__.py          # Python part of the component
+│   └── frontend/            # React/TypeScript source code
+│       └── build/           # Compiled JS assets (created by 'npm run build' for production/alternative mode)
+└── README.md                # This file
+
+
+This tool was created to assist educators and chemists in quickly generating high-quality Moodle quiz content.
 
 ## License
 This project is licensed under the CC BY_NC_SA 4.0 License. See the [LICENSE](LICENSE) file for details.
