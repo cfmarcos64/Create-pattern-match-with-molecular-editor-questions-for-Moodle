@@ -83,12 +83,19 @@ The Streamlit server will automatically connect to the component development ser
 The project directory should contain at least these files:
 
 / (repository root)
+
 ├── MoleculeToMoodleJSME.py  # The main Streamlit application
+
 ├── requirements.txt         # Python dependency list
+
 ├── my_component/            # Directory for the custom JSME component
-│   ├── __init__.py          # Python part of the component
-│   └── frontend/            # React/TypeScript source code
-│       └── build/           # Compiled JS assets (created by 'npm run build' for production/alternative mode)
+
+│    ├── __init__.py          # Python part of the component
+
+│    └── frontend/            # React/TypeScript source code
+
+│         └── build/           # Compiled JS assets (created by 'npm run build' for production/alternative mode)
+
 └── README.md                # This file
 
 
