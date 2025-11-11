@@ -80,29 +80,31 @@ The Streamlit server will automatically connect to the component development ser
 
 ## 📁 File Structure
 
-The project directory should contain at least these files:
+The repository is organized into two main parts: the Streamlit Python application and the custom component frontend. The project directory should contain at least these files:
 
 / (repository root)
 
-├── MoleculeToMoodleJSME.py  # The main Streamlit application
+├── MoleculeToMoodleJSME.py  # The main Streamlit applicationThe main Streamlit application file. This script defines the user interface (UI), manages input/output data flow, handles the high-level logic for question generation, and calls the custom Python component function (jsme_processor_component) to trigger standardization.
 
-├── requirements.txt         # Python dependency list
+├── requirements.txt         # Lists all necessary Python dependencies (e.g., streamlit, rdkit, etc.) required to run the main Streamlit application.
 
-├──  __init__.py             # Python part of the component
+├──  __init__.py             # The Python Component Bridge. This file contains the Python wrapper function (jsme_processor_component) that links the Python application to the compiled React/TypeScript component files in the frontend/ directory.
 
-├── frontend/                # React/TypeScript source code
+├── frontend/                # The root directory for the Streamlit custom component's source code. This includes all necessary files for building the React/TypeScript application that hosts the JSME logic.
 
-│    └── index.html
+│    └── index.html         # The entry point HTML file for the custom component. It's the file Streamlit loads to display the component in the browser. It typically loads the bundled JavaScript assets.
 
-│    └── vite.config.ts
+│    └── vite.config.ts     # The Vite bundler configuration file. This dictates how the TypeScript and React files are compiled and optimized into the static JavaScript, HTML, and CSS assets used by the component.
 
-│    └── src/
+│    └── src/               # Source directory for the core component files.
 
-│    └──    └── MyComponent.tsx
+│    └──    └── MyComponent.tsx    # The Core React Component containing the primary client-side logic. This component is responsible for loading the hidden JSME applet, listening for SMILES input from Python, invoking the JSME standardization, and reliably returning the processed SMILES (with a unique request ID) back to the Streamlit backend.
 
-│    └── node_modules/       # Compiled JS assets (created by 'npm run build' for production/alternative mode)
+│    └── node_modules/      # Directory containing all local JavaScript dependencies installed via npm. This directory is necessary for development and building but should generally be excluded from version control (e.g., via .gitignore).
 
-└── README.md                # This file
+└── README.md               # This file, providing an overview of the project and its structure.  
+
+
 
 
 *This tool was created to assist educators and chemists in quickly generating high-quality Moodle quiz content.*
