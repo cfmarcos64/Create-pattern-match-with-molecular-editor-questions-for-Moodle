@@ -88,11 +88,13 @@ The repository is organized into two main parts: the Streamlit Python applicatio
 
 ├── requirements.txt         # Lists all necessary Python dependencies (e.g., streamlit, rdkit, etc.) required to run the main Streamlit application.
 
-├──  __init__.py             # The Python Component Bridge. This file contains the Python wrapper function (jsme_processor_component) that links the Python application to the compiled React/TypeScript component files in the frontend/ directory.
+├──  my_component/
+
+│    └── __init__.py         # The Python Component Bridge. This file contains the Python wrapper function (jsme_processor_component) that links the Python application to the compiled React/TypeScript component files in the frontend/ directory.
 
 ├── frontend/                # The root directory for the Streamlit custom component's source code. This includes all necessary files for building the React/TypeScript application that hosts the JSME logic.
 
-│    └── index.html         # The entry point HTML file for the custom component. It's the file Streamlit loads to display the component in the browser. It typically loads the bundled JavaScript assets.
+│    └── index.html          # The entry point HTML file for the custom component. It's the file Streamlit loads to display the component in the browser. It typically loads the bundled JavaScript assets.
 
 │    └── vite.config.ts     # The Vite bundler configuration file. This dictates how the TypeScript and React files are compiled and optimized into the static JavaScript, HTML, and CSS assets used by the component.
 
