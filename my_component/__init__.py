@@ -14,10 +14,8 @@ if not _RELEASE:
 
 else:
     # Deployment mode:
-    parent_dir = os.path.dirname(os.path.abspath(__file__))
-    # CORRECTO: Subir un nivel desde 'my_component' y luego entrar en 'frontend/build'
-    root_dir = os.path.dirname(parent_dir) 
-    build_dir = os.path.join(root_dir, "frontend/build")
+    parent_dir = os.path.dirname(os.path.abspath(__file__)) 
+    build_dir = os.path.join(parent_dir, "frontend/build")
     _component_func = components.declare_component("jsme_editor", path=build_dir)
 
 
