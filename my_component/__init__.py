@@ -1,17 +1,22 @@
 import os
 import streamlit.components.v1 as components
 
+# Determines if we are in development or deployment mode
+# _RELEASE = True activates the deployment mode.
 _RELEASE = True
 
 if not _RELEASE:
+    # If we are in development, we aim the Vite local de server (we we do not use it here, but the structure is kept)
     _component_func = components.declare_component(
         "jsme_editor",
         url="http://localhost:3001",
     )
 else:
+    # Deployment mode:
+    # The route aims directly to the 'frontend' folder that contains the final index.html.
     parent_dir = os.path.dirname(os.path.abspath(__file__))
-    build_dir = os.path.join(parent_dir, "frontend/build")
-    _component_func = components.declare_component("jsme_editor", path=build_dir)
+    _FRONTEND_DIR = os.path.join(parent_dir, "frontend")
+    _component_func = components.declare_component("jsme_editor", path=_FRONTEND_DIR)
 
 
 def jsme_editor(smiles_json, key=None):
