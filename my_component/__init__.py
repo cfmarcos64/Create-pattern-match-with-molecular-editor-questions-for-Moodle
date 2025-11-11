@@ -11,12 +11,14 @@ if not _RELEASE:
         "jsme_editor",
         url="http://localhost:3001",
     )
+
 else:
     # Deployment mode:
-    # The route aims directly to the 'frontend' folder that contains the final index.html.
     parent_dir = os.path.dirname(os.path.abspath(__file__))
-    _FRONTEND_DIR = os.path.join(parent_dir, "frontend")
-    _component_func = components.declare_component("jsme_editor", path=_FRONTEND_DIR)
+    # CORRECTO: Subir un nivel desde 'my_component' y luego entrar en 'frontend/build'
+    root_dir = os.path.dirname(parent_dir) 
+    build_dir = os.path.join(root_dir, "frontend/build")
+    _component_func = components.declare_component("jsme_editor", path=build_dir)
 
 
 def jsme_editor(smiles_json, key=None):
