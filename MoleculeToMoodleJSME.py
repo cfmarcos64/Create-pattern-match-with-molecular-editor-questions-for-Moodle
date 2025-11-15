@@ -730,7 +730,7 @@ with main_col:
         
         if is_api_mode:
             # --- API SEARCH MODE ---
-            st.markdown("#### Búsqueda por Nombre (NCI CIR)")(texts["section_individual"])
+            st.markdown(texts["name_search"])
             molecule_name = st.text_input(
                 texts["molecule_name"], 
                 disabled=disabled_input,
