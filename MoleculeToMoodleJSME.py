@@ -45,100 +45,94 @@ except ImportError:
 # Interface texts in different languages (Spanish and English)
 TEXTS = {
     "es": {
-        "title": "Generador de preguntas Moodle con SMILES (JSME + NCI CIR) 🧪",
-        "section_individual": "1. Entrada Individual",
-        "section_bulk": "2. Carga Masiva (CSV / Excel)",
-        "expand_bulk": "Abrir Conversión Masiva",
-        "section_export": "3. Exportar",
-        "molecule_name": "Nombre de la molécula",
-        "custom_question_name": "Nombre de la pregunta (para el enunciado)",
-        "name_note_individual": "Usará el Nombre para buscar el SMILES NCI si la casilla está marcada.",
-        "search_smiles": "Modo: Usar Nombre (buscar en NCI CIR y estandarizar)",
-        "smiles_input": "SMILES (manual)",
-        "add_pending": "Buscar/Validar y Añadir a Pendientes",
-        "start_standardization": "Iniciar Estandarización JSME ({} pendientes)",
-        "pending_list_title": "Lista de preguntas pendientes de estandarizar",
-        "upload_file": "Seleccionar archivo CSV/Excel (.csv, .xlsx, .xls)",
-        "bulk_note": "Asegúrate de que el archivo contenga una columna llamada **'nombre'** con los nombres de las moléculas. Se recomienda usar nombres en inglés para la API de CIR.",
-        "file_format_error": "Formato de archivo no soportado. Por favor, sube un archivo CSV, XLSX o XLS.",
-        "column_error": "El archivo debe contener la columna requerida: {}. Si estás usando un archivo en inglés, puede ser 'name'.",
-        "bulk_success": "Procesamiento masivo finalizado: **{}** éxitos, **{}** fallos.",
-        "smiles_not_found": "Molécula no encontrada por NCI CIR o la estructura no se pudo generar/estandarizar.", 
-        "invalid_smiles": "SMILES inválido o no encontrado.",
-        "question_added_pending": "Añadido a pendientes: {}",
-        "questions_added_subtitle": "Preguntas añadidas (Estandarizadas con JSME)",
-        "clear_all": "Borrar todas las preguntas",
-        "download_xml": "Descargar XML Moodle",
-        "xml_error": "Error al generar el archivo XML: {}",
-        "question_title": "Estructura de {}",
-        "question_text": "Dibuja la estructura de <strong>{}</strong> usando el editor molecular.",
-        "delete_tooltip": "Borrar",
-        "jsme_status": "Procesador JSME: ",
-        "processing_wait": "Procesando... Esperando respuesta del componente JSME.",
-        "start_bulk": "Iniciar Procesamiento Masivo",
-        "bulk_progress": "Progreso Masivo: {} de {} moléculas procesadas.",
-        "bulk_api_lookup": "Buscando SMILES para **{}** ({} de {})",
-        "bulk_jsme_process": "Estandarizando SMILES para **{}** ({} de {})",
-        "bulk_finished": "Procesamiento Masivo Finalizado.",
-        "smiles_hint": "Si el modo es **Usar Nombre**, se busca el SMILES en NCI. Si es **Manual**, debe proporcionar el SMILES y el nombre para el enunciado.",
-        "missing_question_name": "Modo Manual: Debe introducir un Nombre de la pregunta para el enunciado. Por favor, escriba el nombre en el campo superior antes de volver a pulsar 'Añadir a Pendientes'.",
-        "standardization_summary": "Estandarización de pendientes finalizada: **{}** éxitos, **{}** fallos (de {} elementos).",
-        # --- NEW ERROR MESSAGES FOR LOCALIZATION ---
-        "processing_running": "El procesador JSME está ocupado. Por favor, espere a que finalice el proceso actual.",
-        "missing_molecule_name": "Modo Búsqueda: Debe introducir un Nombre de la molécula para realizar la consulta a la API.",
-        "missing_smiles_manual": "Modo Manual: Debe introducir un SMILES válido.",
-        "bulk_empty_file": "El archivo está vacío o no contiene nombres válidos.",
-        "bulk_no_valid_smiles": "No se encontró ningún SMILES válido para procesar después de la consulta NCI CIR.",
-        "generic_file_error": "Error durante la carga o procesamiento del archivo: {}",
-        "jsme_error_prefix": "Error de procesamiento JSME para '{}': {}"
+        "title": "Generador de Preguntas Químicas para Moodle (JSME + NCI CIR) 🧪",
+        "question_title": "Dibuja la estructura de {0}",
+        "question_text": "Utiliza el editor JSME para dibujar la estructura molecular del compuesto: **{0}**",
+        "jsme_error_prefix": "❌ Error al procesar '{0}': El editor JSME devolvió un error: {1}",
+        "invalid_smiles": "🚨 SMILES inválido detectado (falló la validación con RDKit).",
+        "processing_running": "⚠️ Ya hay un proceso de estandarización en curso. Espera a que termine.",
+        "name_search": "Búsqueda por Nombre (NCI CIR)"
+        "missing_molecule_name": "🚨 Por favor, introduce el nombre de una molécula para buscar.",
+        "smiles_not_found": "🚨 No se pudo encontrar el SMILES para ese nombre en NCI CIR.",
+        "missing_smiles_manual": "🚨 Por favor, introduce una cadena SMILES válida.",
+        "missing_question_name": "Debes especificar un nombre para la pregunta cuando introduces el SMILES manualmente.",
+        "question_added_pending": "✅ Pregunta '{0}' añadida a la lista pendiente.",
+        "standardization_summary": "✅ Estandarización finalizada. Éxito: **{0}**, Fallo: **{1}** (Total: **{2}**).",
+        "bulk_success": "✅ Carga masiva finalizada. Éxito: **{0}**, Fallo: **{1}**.",
+        "file_format_error": "🚨 Formato de archivo no soportado. Usa .csv, .xlsx o .xls.",
+        "column_error": "🚨 El archivo debe contener una columna llamada {0}.",
+        "bulk_empty_file": "⚠️ El archivo no contiene nombres de moléculas.",
+        "bulk_no_valid_smiles": "🚨 No se pudo encontrar ningún SMILES válido en NCI CIR desde el archivo cargado.",
+        "generic_file_error": "🚨 Error al procesar el archivo: {0}",
+        "processing_wait": "Esperando respuesta del editor JSME para la estandarización...",
+        "bulk_jsme_process": "Procesando: **{0}** ({1}/{2}). Esperando respuesta de JSME...",
+        "section_individual": "1. Entrada Individual (Nombre o SMILES)",
+        "search_smiles": "Buscar SMILES por Nombre (API NCI CIR)",
+        "smiles_hint": "Las cadenas SMILES de salida se envían a un componente JSME temporal para ser estandarizadas a la forma canónica preferida por el editor.",
+        "molecule_name": "Nombre de la Molécula (Ej: Cafeína)",
+        "smiles_input": "Cadena SMILES (Ej: O=C(C)Oc1ccccc1C(=O)O)",
+        "custom_question_name": "Nombre de la Pregunta (Ej: Ácido acetilsalicílico)",
+        "add_pending": "Añadir a la lista pendiente",
+        "pending_list_title": "2. Lista Pendiente de Estandarización",
+        "start_standardization": "Estandarizar {0} Pregunta(s) Pendiente(s) con JSME",
+        "section_bulk": "3. Carga Masiva (Búsqueda por API)",
+        "expand_bulk": "Instrucciones de Carga Masiva",
+        "bulk_note": "Sube un archivo .csv o .xlsx con una columna llamada **'nombre'** o **'name'**. El sistema buscará el SMILES para cada nombre y luego lo estandarizará con JSME.",
+        "upload_file": "Subir archivo de nombres",
+        "start_bulk": "Iniciar Búsqueda y Estandarización Masiva",
+        "section_export": "4. Exportar Cuestionario Moodle",
+        "clear_all": "Limpiar todas las preguntas",
+        "download_xml": "Descargar XML de Moodle",
+        "xml_error": "🚨 Error al generar el XML: {0}",
+        "questions_added_subtitle": "Preguntas Estandarizadas Listas para Exportar",
+        "delete_tooltip": "Eliminar esta pregunta",
+        "jsme_status": "Estatus de la Operación:",
+        "bulk_api_lookup": "Buscando en NCI CIR: **{0}** ({1}/{2})"
     },
     "en": {
-        "title": "Moodle Question Generator with SMILES (JSME + NCI CIR) 🧪",
-        "section_individual": "1. Individual Entry",
-        "section_bulk": "2. Bulk Upload (CSV / Excel)",
-        "expand_bulk": "Open Bulk Conversion",
-        "section_export": "3. Export",
-        "molecule_name": "Molecule name",
-        "custom_question_name": "Question Name (for the statement)",
-        "name_note_individual": "It will use the Name to search for the NCI SMILES if the checkbox is checked.",
-        "search_smiles": "Mode: Use Name (search NCI CIR and standardize)",
-        "smiles_input": "SMILES (manual)",
-        "add_pending": "Search/Validate and Add to Pending",
-        "start_standardization": "Start JSME Standardization ({} pending)",
-        "pending_list_title": "List of pending questions for standardization",
-        "upload_file": "Select CSV/Excel file (.csv, .xlsx, .xls)",
-        "bulk_note": "Ensure the file contains a column called **'name'** with the molecule names. It is recommended to use English names for the CIR API.",
-        "file_format_error": "Unsupported file format. Please upload a CSV, XLSX, or XLS file.",
-        "column_error": "The file must contain the required column: {}. If you are using an English file, it can be 'name'.",
-        "bulk_success": "Bulk processing finished: **{}** successes, **{}** failures.",
-        "smiles_not_found": "Molecule not found by NCI CIR or the structure could not be generated/standardized.", 
-        "invalid_smiles": "Invalid or not found SMILES.",
-        "question_added_pending": "Added to pending: {}",
-        "questions_added_subtitle": "Questions Added (Standardized with JSME)",
+        "title": "Moodle Chemical Question Generator (JSME + NCI CIR) 🧪",
+        "question_title": "Draw the structure of {0}",
+        "question_text": "Use the JSME editor to draw the molecular structure of the compound: **{0}**",
+        "jsme_error_prefix": "❌ Error processing '{0}': The JSME editor returned an error: {1}",
+        "invalid_smiles": "🚨 Invalid SMILES detected (RDKit validation failed).",
+        "processing_running": "⚠️ A standardization process is already running. Please wait for it to finish.",
+        "name_search": "Molecule name seach (NCI CIR)"
+        "missing_molecule_name": "🚨 Please enter a molecule name to search.",
+        "smiles_not_found": "🚨 Could not find the SMILES for that name in NCI CIR.",
+        "missing_smiles_manual": "🚨 Please enter a valid SMILES string.",
+        "missing_question_name": "You must specify a name for the question when entering SMILES manually.",
+        "question_added_pending": "✅ Question '{0}' added to the pending list.",
+        "standardization_summary": "✅ Standardization finished. Success: **{0}**, Failure: **{1}** (Total: **{2}**).",
+        "bulk_success": "✅ Bulk upload finished. Success: **{0}**, Failure: **{1}**.",
+        "file_format_error": "🚨 Unsupported file format. Please use .csv, .xlsx, or .xls.",
+        "column_error": "🚨 The file must contain a column named {0}.",
+        "bulk_empty_file": "⚠️ The file contains no molecule names.",
+        "bulk_no_valid_smiles": "🚨 No valid SMILES could be found in NCI CIR from the uploaded file.",
+        "generic_file_error": "🚨 Error processing the file: {0}",
+        "processing_wait": "Waiting for response from the JSME editor for standardization...",
+        "bulk_jsme_process": "Processing: **{0}** ({1}/{2}). Waiting for JSME response...",
+        "section_individual": "1. Individual Entry (Name or SMILES)",
+        "search_smiles": "Search SMILES by Name (NCI CIR API)",
+        "smiles_hint": "The output SMILES strings are sent to a temporary JSME component to be standardized to the editor's preferred canonical form.",
+        "molecule_name": "Molecule Name (Ex: Caffeine)",
+        "smiles_input": "SMILES String (Ex: O=C(C)Oc1ccccc1C(=O)O)",
+        "custom_question_name": "Question Name (Ex: Acetylsalicylic Acid)",
+        "add_pending": "Add to Pending List",
+        "pending_list_title": "2. Pending Standardization List",
+        "start_standardization": "Standardize {0} Pending Question(s) with JSME",
+        "section_bulk": "3. Bulk Upload (API Search)",
+        "expand_bulk": "Bulk Upload Instructions",
+        "bulk_note": "Upload a .csv or .xlsx file with a column named **'nombre'** or **'name'**. The system will search for the SMILES for each name and then standardize it with JSME.",
+        "upload_file": "Upload file of names",
+        "start_bulk": "Start Bulk Search and Standardization",
+        "section_export": "4. Export Moodle Quiz",
         "clear_all": "Clear all questions",
         "download_xml": "Download Moodle XML",
-        "xml_error": "Error generating XML file: {}",
-        "question_title": "Structure of {}",
-        "question_text": "Draw the structure of <strong>{}</strong> using the molecular editor.",
-        "delete_tooltip": "Delete",
-        "jsme_status": "JSME Processor: ",
-        "processing_wait": "Processing... Waiting for response from JSME component.",
-        "start_bulk": "Start Bulk Processing",
-        "bulk_progress": "Bulk Progress: {} of {} molecules processed.",
-        "bulk_api_lookup": "Searching SMILES for **{}** ({} of {})",
-        "bulk_jsme_process": "Standardizing SMILES for **{}** ({} of {})",
-        "bulk_finished": "Bulk Processing Finished.",
-        "smiles_hint": "If the mode is **Use Name**, the SMILES is searched in NCI. If it is **Manual**, you must provide the SMILES and the name for the statement.",
-        "missing_question_name": "Manual Mode: You must enter a Question Name for the statement. Please write the name in the field above before pressing 'Add to Pending' again.",
-        "standardization_summary": "Pending standardization finished: **{}** successes, **{}** failures (out of {} items).",
-        # --- NEW ERROR MESSAGES FOR LOCALIZATION ---
-        "processing_running": "The JSME processor is busy. Please wait for the current process to finish.",
-        "missing_molecule_name": "Search Mode: You must enter a Molecule Name to query the API.",
-        "missing_smiles_manual": "Manual Mode: You must enter a valid SMILES.",
-        "bulk_empty_file": "The file is empty or does not contain valid names.",
-        "bulk_no_valid_smiles": "No valid SMILES were found to process after the NCI CIR lookup.",
-        "generic_file_error": "Error during file upload or processing: {}",
-        "jsme_error_prefix": "JSME processing error for '{}': {}"
+        "xml_error": "🚨 Error generating XML: {0}",
+        "questions_added_subtitle": "Standardized Questions Ready for Export",
+        "delete_tooltip": "Delete this question",
+        "jsme_status": "Operation Status:",
+        "bulk_api_lookup": "Searching NCI CIR: **{0}** ({1}/{2})"
     }
 }
 
@@ -280,6 +274,7 @@ if "last_job_type" not in st.session_state:
 if "last_job_summary" not in st.session_state:
     st.session_state.last_job_summary = None # The persistent summary text to display
 
+# IMPORTANT: Ensure TEXTS is defined before this line
 texts = TEXTS[st.session_state.lang]
 
 
@@ -375,8 +370,8 @@ if st.session_state.jsme_input and st.session_state.pending_request and st.sessi
         else:
              # Output is a specific JSME error (not standardizable)
              if not is_bulk and not str(output_json).startswith("JSME_ERROR:"):
-                # Use a more descriptive error message here
-                st.error(texts["jsme_error_prefix"].format(pending_name, output_smiles or 'Empty/invalid output')) # Localized error
+                 # Use a more descriptive error message here
+                 st.error(texts["jsme_error_prefix"].format(pending_name, output_smiles or 'Empty/invalid output')) # Localized error
              if is_bulk and not str(output_json).startswith("JSME_ERROR:"):
                  st.session_state.bulk_results['failure'] += 1
 
@@ -406,11 +401,11 @@ if st.session_state.jsme_input and st.session_state.pending_request and st.sessi
 
                 if t > 0:
                     if job_type == 'pending':
-                         # Pending Standardization Summary
-                         st.session_state.last_job_summary = texts["standardization_summary"].format(s, f, t)
+                             # Pending Standardization Summary
+                             st.session_state.last_job_summary = texts["standardization_summary"].format(s, f, t)
                     elif job_type == 'bulk_upload':
-                         # Bulk Upload Summary
-                         st.session_state.last_job_summary = texts["bulk_success"].format(s, f) + f" (Total processed by JSME: **{t}**)"
+                             # Bulk Upload Summary
+                             st.session_state.last_job_summary = texts["bulk_success"].format(s, f) + f" (Total processed by JSME: **{t}**)"
                 
                 # Clear temporary tracking state
                 st.session_state.bulk_results = {'success': 0, 'failure': 0, 'total': 0}
@@ -522,7 +517,7 @@ def handle_add_to_pending(molecule_name, smiles_input, custom_name_input, use_ap
 def start_pending_standardization(texts):
     """Moves the pending list to the JSME processing queue and starts the cycle."""
     if not st.session_state.pending_smiles_list:
-        st.warning("The list of pending questions is empty.") # Already localized through hardcoded string (Spanish is the default warning language)
+        st.warning(texts["bulk_empty_file"]) # Using a relevant localized warning
         return
         
     if st.session_state.is_processing:
@@ -598,9 +593,9 @@ def handle_bulk_upload(uploaded_file, texts):
         total_mols = len(names)
         
         if total_mols == 0:
-             st.warning(texts["bulk_empty_file"]) # Localized error
-             return
-             
+              st.warning(texts["bulk_empty_file"]) # Localized error
+              return
+              
         # 3. Clean and Search SMILES (Initial Blocking)
         jsme_queue_temp = []
         bulk_lookup_success = 0
@@ -735,7 +730,7 @@ with main_col:
         
         if is_api_mode:
             # --- API SEARCH MODE ---
-            st.markdown("#### Búsqueda por Nombre (NCI CIR)")
+            st.markdown("#### Búsqueda por Nombre (NCI CIR)")(texts["section_individual"])
             molecule_name = st.text_input(
                 texts["molecule_name"], 
                 disabled=disabled_input,
@@ -783,7 +778,7 @@ with main_col:
         )
         
         if not st.session_state.is_processing:
-             st.rerun() 
+              st.rerun() 
     
     st.markdown("---")
     
@@ -794,7 +789,7 @@ with main_col:
     
     # Display persistent job summary logic
     if st.session_state.last_job_summary:
-         st.info(st.session_state.last_job_summary)
+          st.info(st.session_state.last_job_summary)
     
     st.button(
         texts["start_standardization"].format(num_pending),
@@ -808,7 +803,7 @@ with main_col:
     # List of items pending
     if num_pending > 0:
         for i, item in enumerate(st.session_state.pending_smiles_list):
-             st.markdown(f"**{i+1}.** {item['name']} → `{item['smiles']}` (SMILES Canónico)")
+              st.markdown(f"**{i+1}.** {item['name']} → `{item['smiles']}` (SMILES Canónico)")
         st.markdown("---")
     else:
         st.markdown("_No hay moléculas pendientes de estandarización JSME._")
