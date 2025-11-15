@@ -52,6 +52,7 @@ TEXTS = {
         "invalid_smiles": "🚨 SMILES inválido detectado (falló la validación con RDKit).",
         "processing_running": "⚠️ Ya hay un proceso de estandarización en curso. Espera a que termine.",
         "name_search": "Búsqueda por Nombre (NCI CIR)",
+        "smiles_search": "Entrada Manual de SMILES",
         "missing_molecule_name": "🚨 Por favor, introduce el nombre de una molécula para buscar.",
         "smiles_not_found": "🚨 No se pudo encontrar el SMILES para ese nombre en NCI CIR.",
         "missing_smiles_manual": "🚨 Por favor, introduce una cadena SMILES válida.",
@@ -96,7 +97,8 @@ TEXTS = {
         "jsme_error_prefix": "❌ Error processing '{0}': The JSME editor returned an error: {1}",
         "invalid_smiles": "🚨 Invalid SMILES detected (RDKit validation failed).",
         "processing_running": "⚠️ A standardization process is already running. Please wait for it to finish.",
-        "name_search": "Molecule name seach (NCI CIR)",
+        "name_search": "Molecule Search (NCI CIR)",
+        "smiles_search": "SMILES Manual Input",
         "missing_molecule_name": "🚨 Please enter a molecule name to search.",
         "smiles_not_found": "🚨 Could not find the SMILES for that name in NCI CIR.",
         "missing_smiles_manual": "🚨 Please enter a valid SMILES string.",
@@ -730,7 +732,7 @@ with main_col:
         
         if is_api_mode:
             # --- API SEARCH MODE ---
-            st.markdown(texts["name_search"])
+            st.subheader(texts["name_search"])
             molecule_name = st.text_input(
                 texts["molecule_name"], 
                 disabled=disabled_input,
@@ -739,7 +741,7 @@ with main_col:
             
         else:
             # --- MANUAL SMILES MODE ---
-            st.markdown("#### Entrada Manual de SMILES")
+            st.subheader(texts["smiles_search"])
             
             # 1. SMILES Field
             smiles_input = st.text_input(
