@@ -36,7 +36,7 @@ There are two primary ways to access and use this tool:
 
 The application is deployed publicly and can be accessed directly through this link:
 
-👉 https://github.com/jsme-editor/jsme-editor.github.io
+👉 https://create-pattern-match-with-molecular-editor-questions-for-moodle.streamlit.app/
 
 ### Option 2: Run Locally (Requires Python and Node.js)
 
