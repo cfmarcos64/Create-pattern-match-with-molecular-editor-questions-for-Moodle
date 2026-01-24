@@ -47,7 +47,7 @@ TEXTS = {
     "es": {
         "title": "Generador de Preguntas Químicas para Moodle (JSME + NCI CIR) 🧪",
         "question_title": "Dibuja la estructura de {0}",
-        "question_text": "Utiliza el editor JSME para dibujar la estructura molecular del compuesto: **{0}**",
+        "question_text": "Utiliza el editor JSME para dibujar la estructura molecular del compuesto: {0}",
         "jsme_error_prefix": "❌ Error al procesar '{0}': El editor JSME devolvió un error: {1}",
         "invalid_smiles": "🚨 SMILES inválido detectado (falló la validación con RDKit).",
         "processing_running": "⚠️ Ya hay un proceso de estandarización en curso. Espera a que termine.",
@@ -61,7 +61,6 @@ TEXTS = {
         "standardization_summary": "✅ Estandarización finalizada. Éxito: **{0}**, Fallo: **{1}** (Total: **{2}**).",
         "bulk_success": "✅ Carga masiva finalizada. Éxito: **{0}**, Fallo: **{1}**.",
         "file_format_error": "🚨 Formato de archivo no soportado. Usa .csv, .xlsx o .xls.",
-        "column_error": "🚨 El archivo debe contener una columna llamada {0}.",
         "bulk_empty_file": "⚠️ El archivo no contiene nombres de moléculas.",
         "bulk_no_valid_smiles": "🚨 No se pudo encontrar ningún SMILES válido en NCI CIR desde el archivo cargado.",
         "generic_file_error": "🚨 Error al procesar el archivo: {0}",
@@ -78,7 +77,8 @@ TEXTS = {
         "start_standardization": "Estandarizar {0} Pregunta(s) Pendiente(s) con JSME",
         "section_bulk": "3. Carga Masiva (Búsqueda por API)",
         "expand_bulk": "Instrucciones de Carga Masiva",
-        "bulk_note": "Sube un archivo .csv o .xlsx con una columna llamada **'nombre'** o **'name'**. El sistema buscará el SMILES para cada nombre y luego lo estandarizará con JSME.",
+        "bulk_note": "Sube un archivo .csv o .xlsx con dos columnas: **'name'** (nombre en inglés para buscar el SMILES) y **'nombre'** (nombre en español para la pregunta).",
+        "column_error": "🚨 El archivo debe contener las columnas {0}.",
         "upload_file": "Subir archivo de nombres",
         "start_bulk": "Iniciar Búsqueda y Estandarización Masiva",
         "section_export": "4. Exportar Cuestionario Moodle",
@@ -87,13 +87,14 @@ TEXTS = {
         "xml_error": "🚨 Error al generar el XML: {0}",
         "questions_added_subtitle": "Preguntas Estandarizadas Listas para Exportar",
         "delete_tooltip": "Eliminar esta pregunta",
-        "jsme_status": "Estatus de la Operación:",
-        "bulk_api_lookup": "Buscando en NCI CIR: **{0}** ({1}/{2})"
+        "start_NCI_lookup": "Comenzando búsqueda en NCI CIR...",
+        "bulk_api_lookup": "Buscando en NCI CIR: **{0}** ({1}/{2})",
+        "no_pending_text": "No hay moléculas pendientes."
     },
     "en": {
         "title": "Moodle Chemical Question Generator (JSME + NCI CIR) 🧪",
         "question_title": "Draw the structure of {0}",
-        "question_text": "Use the JSME editor to draw the molecular structure of the compound: **{0}**",
+        "question_text": "Use the JSME editor to draw the molecular structure of the compound: {0}",
         "jsme_error_prefix": "❌ Error processing '{0}': The JSME editor returned an error: {1}",
         "invalid_smiles": "🚨 Invalid SMILES detected (RDKit validation failed).",
         "processing_running": "⚠️ A standardization process is already running. Please wait for it to finish.",
@@ -124,7 +125,8 @@ TEXTS = {
         "start_standardization": "Standardize {0} Pending Question(s) with JSME",
         "section_bulk": "3. Bulk Upload (API Search)",
         "expand_bulk": "Bulk Upload Instructions",
-        "bulk_note": "Upload a .csv or .xlsx file with a column named **'nombre'** or **'name'**. The system will search for the SMILES for each name and then standardize it with JSME.",
+        "bulk_note": "Upload a .csv or .xlsx file with a column named **'name'**. The system will search for the SMILES for each name and then standardize it with JSME.",
+        "column_error": "🚨 The file must contain a column named {0}.",
         "upload_file": "Upload file of names",
         "start_bulk": "Start Bulk Search and Standardization",
         "section_export": "4. Export Moodle Quiz",
@@ -133,8 +135,9 @@ TEXTS = {
         "xml_error": "🚨 Error generating XML: {0}",
         "questions_added_subtitle": "Standardized Questions Ready for Export",
         "delete_tooltip": "Delete this question",
-        "jsme_status": "Operation Status:",
-        "bulk_api_lookup": "Searching NCI CIR: **{0}** ({1}/{2})"
+        "start_NCI_lookup": "Starting NCI CIR lookup...",
+        "bulk_api_lookup": "Searching NCI CIR: **{0}** ({1}/{2})",
+        "no_pending_text": "There are no pending molecules."
     }
 }
 
@@ -436,6 +439,8 @@ def handle_add_to_pending(molecule_name, smiles_input, custom_name_input, use_ap
     to the pending list (pending_smiles_list). Persists errors via session_state.
     """
     
+    lang = st.session_state.lang
+    
     # 1. Clear previous state messages
     st.session_state.individual_error_message = None 
     st.session_state.bulk_results = {'success': 0, 'failure': 0, 'total': 0} 
@@ -460,14 +465,25 @@ def handle_add_to_pending(molecule_name, smiles_input, custom_name_input, use_ap
     # 2. CENTRALIZED DECISION LOGIC
     if use_api:
         # NAME SEARCH MODE (NCI CIR API)
-        if not molecule_name:
-            local_status_placeholder.empty()
-            st.session_state.individual_error_message = texts["missing_molecule_name"] # Localized error
-            return
-
-        name_for_question = molecule_name
-        with st.spinner('Searching NCI-CIR and canonicalizing SMILES...'):
-            final_smiles_to_store = name_to_smiles(name_for_question)
+        if lang == "es":
+            # REQUIRED: Both name fields filled
+            if not molecule_name or not custom_name_input:
+                st.session_state.individual_error_message = "⚠️ Por favor, introduce el nombre en inglés y el nombre en español."
+                return
+            lookup_name = molecule_name      # Name in English for the API
+            name_for_question = custom_name_input # Name in Spanish for the question
+        else:
+            # REQUIRED: At least name in English
+            if not molecule_name:
+                st.session_state.individual_error_message = texts["missing_molecule_name"]
+                return
+            lookup_name = molecule_name
+            name_for_question = molecule_name
+        
+        # Call the API
+        local_status_placeholder.info(f"{texts['jsme_status']} Searching SMILES for '{lookup_name}'...")
+        with st.spinner('Searching NCI-CIR...'):
+            final_smiles_to_store = name_to_smiles(lookup_name)
         
         if not final_smiles_to_store:
             local_status_placeholder.empty()
@@ -562,11 +578,13 @@ def start_pending_standardization(texts):
 def handle_bulk_upload(uploaded_file, texts):
     """
     Reads the file, searches for SMILES, and fills the processing queue.
+    Bulk search conditional by language.
     """
     if st.session_state.is_processing or st.session_state.bulk_queue:
         st.warning(texts["processing_running"]) # Localized error
         return
         
+    lang = st.session_state.lang  # Detects current language
     # Clear previous error and summary state before starting the new job
     st.session_state.individual_error_message = None 
     st.session_state.bulk_results = {'success': 0, 'failure': 0, 'total': 0}
@@ -582,39 +600,55 @@ def handle_bulk_upload(uploaded_file, texts):
             st.error(texts["file_format_error"]) # Localized error
             return
 
-        # 2. Validate column
-        name_col = 'nombre'
-        if name_col not in df.columns:
-            # Try with 'name' if it's in English
-            name_col = 'name'
-            if name_col not in df.columns:
-                st.error(texts["column_error"].format("'nombre' o 'name'")) # Localized error
+        # 2. Validate column according to language
+        if lang == "es":
+            if 'name' not in df.columns or 'nombre' not in df.columns:
+                st.error(texts["column_error"].format("'name' y 'nombre'"))
                 return
+            required_cols = ['name', 'nombre']
+        else: # English
+            if 'name' not in df.columns:
+                st.error(texts["column_error"].format("'name'"))
+                return
+            required_cols = ['name']
         
-        names = df[name_col].astype(str).tolist()
-        total_mols = len(names)
+        # Filter empty rows
+        # Remove rows where required columns are void (NaN)
+        df = df.dropna(subset=required_cols)
         
+        # Remove rows where required columns are blank
+        for col in required_cols:
+            df = df[df[col].astype(str).str.strip() != ""]
+        
+        total_mols = len(df)
         if total_mols == 0:
-              st.warning(texts["bulk_empty_file"]) # Localized error
+              st.warning(texts["bulk_empty_file"])
               return
               
         # 3. Clean and Search SMILES (Initial Blocking)
         jsme_queue_temp = []
         bulk_lookup_success = 0
         
-        progress_bar = st.progress(0, text="Starting NCI CIR lookup...")
+        progress_bar = st.progress(0, text=texts["start_NCI_lookup"])
         
-        for i, name in enumerate(names):
-            name = name.strip()
-            progress_bar.progress((i + 1) / total_mols, text=texts['bulk_api_lookup'].format(name, i + 1, total_mols))
+        for i, row in df.iterrows():
+            # LÓGICA DE NOMBRES
+            if lang == "es":
+                lookup_name = str(row['name']).strip()   # Name in Engllish for API
+                display_name = str(row['nombre']).strip() # Name in Spanish for the question
+            else:
+                lookup_name = str(row['name']).strip()   # Name in Engllish for API
+                display_name = lookup_name               # Name in Engllish for the question
+
+            progress_bar.progress((i + 1) / total_mols, text=texts['bulk_api_lookup'].format(lookup_name, i + 1, total_mols))            
             
             # API Lookup (Blocking)
-            smiles = name_to_smiles(name)
+            smiles = name_to_smiles(lookup_name)
             
             if smiles:
                 bulk_lookup_success += 1
                 jsme_queue_temp.append({
-                    'name': name, 
+                    'name': display_name, 
                     'smiles': smiles,
                     'is_bulk': True,
                     'total': total_mols,
@@ -729,15 +763,31 @@ with main_col:
         custom_name_input = ""
         
         is_api_mode = st.session_state.use_api_search_form
+        lang = st.session_state.lang
         
         if is_api_mode:
             # --- API SEARCH MODE ---
             st.subheader(texts["name_search"])
-            molecule_name = st.text_input(
-                texts["molecule_name"], 
-                disabled=disabled_input,
-                key="api_molecule_name_input"
-            )
+            if lang == "es":
+                molecule_name = st.text_input(
+                    "Nombre en Inglés (para búsqueda API)", 
+                    disabled=disabled_input,
+                    key="api_mol_en",
+                    placeholder="Ej: Caffeine"
+                )
+                custom_name_input = st.text_input(
+                    "Nombre en Español (para la pregunta)", 
+                    disabled=disabled_input,
+                    key="api_mol_es",
+                    placeholder="Ej: Cafeína"
+                )
+            else:
+                # English
+                molecule_name = st.text_input(
+                    texts["molecule_name"], 
+                    disabled=disabled_input,
+                    key="api_molecule_name_input"
+                )
             
         else:
             # --- MANUAL SMILES MODE ---
