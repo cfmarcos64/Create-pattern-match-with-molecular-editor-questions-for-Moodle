@@ -90,6 +90,7 @@ TEXTS = {
         "start_standardization": "Estandarizar {0} Pregunta(s) Pendiente(s) con JSME",
         "standardization_summary": "✅ Estandarización finalizada. Éxito: **{0}**, Fallo: **{1}** (Total: **{2}**).",
         "title": "Generador de Preguntas Químicas para Moodle (JSME + NCI CIR) 🧪",
+        "upload_file": "Subir archivo de nombres",
         "xml_error": "🚨 Error al generar el XML: {0}"
     },
     "en": {
@@ -138,6 +139,7 @@ TEXTS = {
         "start_standardization": "Standardize {0} Pending Question(s) with JSME",
         "standardization_summary": "✅ Standardization finished. Success: **{0}**, Failure: **{1}** (Total: **{2}**).",
         "title": "Moodle Chemical Question Generator (JSME + NCI CIR) 🧪",
+        "upload_file": "Upload file of names",
         "xml_error": "🚨 Error generating XML: {0}"
     }
 }
