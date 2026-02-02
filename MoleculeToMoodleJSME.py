@@ -89,6 +89,7 @@ TEXTS = {
         "delete_tooltip": "Eliminar esta pregunta",
         "start_NCI_lookup": "Comenzando búsqueda en NCI CIR...",
         "bulk_api_lookup": "Buscando en NCI CIR: **{0}** ({1}/{2})",
+        "jsme_status": "Estado JSME:",
         "no_pending_text": "No hay moléculas pendientes."
     },
     "en": {
@@ -137,6 +138,7 @@ TEXTS = {
         "delete_tooltip": "Delete this question",
         "start_NCI_lookup": "Starting NCI CIR lookup...",
         "bulk_api_lookup": "Searching NCI CIR: **{0}** ({1}/{2})",
+        "jsme_status": "JSME Status:",
         "no_pending_text": "There are no pending molecules."
     }
 }
